@@ -45,7 +45,7 @@ select,input{width:100%;min-width:0;background:#0d1014;color:#f7f3f4;border:2px 
 <script>
 // Conexión con Google Sheets mediante una implementación web de Google Apps Script.
 // Pega aquí la URL de implementación que termina en /exec.
-const GOOGLE_SHEETS_WEB_APP_URL="PEGA_AQUI_LA_URL_DE_APPS_SCRIPT";
+const GOOGLE_SHEETS_WEB_APP_URL="https://script.google.com/macros/s/AKfycbybP4magJ4yvWrLlZq-aLa0xoPK7YDLgTrRvTJtSYAM2aDYFU5t29VUnkqgm2iXjS_WMQ/exec";
 const attendees=document.getElementById("attendees"), form=document.getElementById("form"), statusBox=document.getElementById("status"), result=document.getElementById("result");
 let generated=[];
 function makeAttendee(i){const c=document.createElement("div");c.className="attendee";c.innerHTML=`<div class="attendee-title">Persona ${i}</div><div class="input-wrap"><span class="ico">♙</span><input name="name" placeholder="Nombre completo" maxlength="120" required aria-label="Nombre completo"></div><div class="input-wrap"><span class="ico">▤</span><input name="document" placeholder="Número de identificación" maxlength="40" required aria-label="Número de identificación"></div><div class="input-wrap"><span class="ico">✉</span><input name="email" type="email" placeholder="Correo electrónico" maxlength="254" required aria-label="Correo electrónico"></div>`;return c}
@@ -57,11 +57,30 @@ form.addEventListener("submit",async e=>{e.preventDefault();if(!form.reportValid
 const people=[...attendees.children].map(c=>({nombre:c.querySelector('[name="name"]').value.trim(),identificacion:c.querySelector('[name="document"]').value.trim(),correo:c.querySelector('[name="email"]').value.trim().toLowerCase(),codigo_qr:makeId()}));
 const btn=document.getElementById("submit");btn.disabled=true;btn.textContent="Generando códigos...";result.classList.remove("show");
 try{
-if(!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL==="PEGA_AQUI_LA_URL_DE_APPS_SCRIPT"){
+if(!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL==="https://script.google.com/macros/s/AKfycbybP4magJ4yvWrLlZq-aLa0xoPK7YDLgTrRvTJtSYAM2aDYFU5t29VUnkqgm2iXjS_WMQ/exec"){
 throw new Error("Falta conectar Google Sheets: pega la URL de Apps Script en GOOGLE_SHEETS_WEB_APP_URL.");
 }
 const payload=JSON.stringify({registros:people});
-await fetch(GOOGLE_SHEETS_WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:payload});
+await fetch(const GOOGLE_SHEETS_WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbybP4magJ4yvWrLlZq-aLa0xoPK7YDLgTrRvTJtSYAM2aDYFU5t29VUnkqgm2iXjS_WMQ/exec";
+
+const payload = JSON.stringify({
+  registros: people.map(p => ({
+    nombre: p.nombre || "",
+    identificacion: p.identificacion || "",
+    correo: p.correo || "",
+    codigo_qr: p.codigo_qr || ""
+  }))
+});
+
+await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: payload
+});
 generated=people;const holder=document.getElementById("qrs");holder.innerHTML="";
 people.forEach((p,i)=>{const card=document.createElement("div");card.className="qr-card";const title=document.createElement("p");title.textContent="Persona "+(i+1)+" · "+p.nombre;const q=document.createElement("div");q.style.display="flex";q.style.justifyContent="center";card.append(title,q);holder.appendChild(card);new QRCode(q,{text:p.codigo_qr,width:180,height:180,correctLevel:QRCode.CorrectLevel.H})});
 statusBox.textContent="Solicitud enviada a Google Sheets y códigos QR generados. Verifica que la URL de Apps Script esté desplegada correctamente.";statusBox.className="status show success";result.classList.add("show")
